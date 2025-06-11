@@ -1,11 +1,17 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import Link from "next/link" // Added Link
-import { ChevronLeft, Settings, LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react" // Added Icons
+import Link from "next/link"
+import { ChevronLeft, Settings, LogIn, UserPlus, LayoutDashboard, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { useAuth } from "@/contexts/AuthContext" // Added useAuth
+import { useAuth } from "@/contexts/AuthContext"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip" // Import Tooltip components
 
 export function Header({ title, showBack = false }: { title: string; showBack?: boolean }) {
   const router = useRouter();
@@ -32,9 +38,18 @@ export function Header({ title, showBack = false }: { title: string; showBack?: 
     <div className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-background border-b">
       <div className="flex items-center">
         {showBack && (
-          <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip delayDuration={100}>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={() => router.back()} className="mr-2">
+                  <ChevronLeft className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Go Back</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
         {/* If there's no back button, the title becomes the home link */}
         {!showBack ? <MainTitle /> : <h1 className="text-lg font-medium">{title}</h1>}
@@ -70,9 +85,18 @@ export function Header({ title, showBack = false }: { title: string; showBack?: 
           </>
         )}
         {/* Settings button can be conditional or always present */}
-        <Button variant="ghost" size="icon" onClick={() => router.push("/settings")} title="Settings">
-          <Settings className="h-5 w-5" />
-        </Button>
+        <TooltipProvider>
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <Button variant="ghost" size="icon" onClick={() => router.push("/settings")}>
+                <Settings className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Settings</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     </div>
   )

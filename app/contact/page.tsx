@@ -21,7 +21,7 @@ export default function ContactPage() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Contact Us</h1>
         <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
           <p>If you have any questions, concerns, or feedback regarding FileShareX, please feel free to reach out to us. We value your input and are here to help.</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">General Inquiries</h2>
           <p>For general questions about our service, features, or how to use FileShareX, please email us at:</p>
           <p><a href="mailto:support@example.com" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">support@example.com</a> (This is a placeholder email)</p>
@@ -32,7 +32,7 @@ export default function ContactPage() {
 
           <h2 className="text-xl font-semibold mt-6 mb-3">Abuse Reports</h2>
           <p>To report abuse or a violation of our Terms of Service, please use the "Report Abuse" button found on the download page of the respective file. For general information on reporting abuse, see our <a href="/report-abuse-info" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">Report Abuse Information page</a>.</p>
-          
+
           <p className="mt-8 text-sm">
             <em>Please note: The contact email addresses provided are placeholders. This page will be updated with actual contact information.</em>
           </p>

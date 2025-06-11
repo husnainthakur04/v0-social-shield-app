@@ -4,7 +4,11 @@ import type { Metadata, Viewport } from "next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Footer } from "@/components/footer"
-import { AuthProvider } from "@/contexts/AuthContext" // Import AuthProvider
+import { AuthProvider } from "@/contexts/AuthContext" // Re-add AuthProvider
+// import { Header } from "@/components/header";
+// If Header was meant to be directly in RootLayout, that's a different structure.
+// The current RootLayout does not directly render a Header. The Header is typically part of the page content or a sub-layout.
+// So, no change needed here for Header unless it was incorrectly placed in RootLayout previously.
 
 const siteName = 'FileShareX';
 const defaultDescription = 'Easily upload, share, and download files with optional password protection and expiry settings. No sign-up needed for quick and secure file sharing.';
@@ -57,7 +61,7 @@ export const metadata: Metadata = {
   // Favicons - Next.js will automatically look for files like icon.png, apple-icon.png in app/ or public/
   // Or you can specify them directly:
   icons: {
-    icon: '/icon.png', // Relative to public folder, or Next.js will use app/icon.png
+    // icon: '/icon.png', // Commented out due to placeholder being an empty file causing build errors. Next.js might auto-detect app/icon.png if valid.
     shortcut: '/favicon.ico', // Example
     apple: '/apple-icon.png', // Example
     // other: [
@@ -87,9 +91,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className="overscroll-none flex flex-col min-h-screen" style={{ margin: 0, padding: 0 }}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider> {/* Wrap with AuthProvider */}
+          <AuthProvider> {/* Re-add AuthProvider */}
             <div className="flex-grow">
-              {children}
+              {children} {/* This will render the simplified page.tsx */}
             </div>
             <Toaster />
             <Footer />

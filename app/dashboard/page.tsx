@@ -3,7 +3,10 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/header'; // Assuming a generic header for dashboard
+import { Header } from '@/components/header';
+import { FileText, UploadCloud } from 'lucide-react'; // Import icons for empty state
+import { Button } from '@/components/ui/button'; // Import Button for CTA
+import Link from 'next/link'; // Import Link for CTA
 
 export default function DashboardPage() {
   const { isAuthenticated, user, loading } = useAuth();
@@ -43,11 +46,11 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* The main app layout already includes a header. 
+      {/* The main app layout already includes a header.
           If a specific dashboard header is needed, it can be added here or handled by layout.
           For now, assuming the global header from layout.tsx is sufficient.
           If a different title is needed for this page in the existing header:
-          <Header title="My Dashboard" /> 
+          <Header title="My Dashboard" />
           But the current Header component might need adjustment to accept title dynamically from pages.
           For this iteration, we'll rely on the global header.
       */}
@@ -56,20 +59,28 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
             Welcome, {user?.email}!
           </h1>
-          
+
           <div className="mt-8 space-y-6">
+            {/* Your Files Section - Enhanced Empty State */}
             <div>
               <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3">Your Files</h2>
-              <div className="p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-md">
-                <p className="text-gray-500 dark:text-gray-400">
-                  (Placeholder) History of your uploads and downloads will be displayed here.
+              <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-center min-h-[200px]">
+                <FileText className="h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
+                <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  No files uploaded yet.
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                  Start by uploading your first file to see it listed here.
                 </p>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">
-                  (Placeholder) Ability to manage and delete your uploaded files will be available here.
-                </p>
+                <Link href="/" passHref>
+                  <Button>
+                    <UploadCloud className="mr-2 h-4 w-4" /> Upload a File
+                  </Button>
+                </Link>
               </div>
             </div>
 
+            {/* Account Details Section - Kept as is, or can be enhanced if needed */}
             <div>
               <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-3">Account Details</h2>
               <div className="p-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-md">

@@ -23,7 +23,7 @@ export function isAdmin(user: UserForAdminCheck | null): boolean {
   // This utility will then just check that flag if present on the user object.
   // For direct usage with process.env.ADMIN_EMAIL (if that env var is available client-side):
   // return user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL; // If ADMIN_EMAIL is exposed to client
-  
+
   // This function will be more useful if the 'user' object itself contains an 'isAdmin' flag
   // populated from the backend (e.g., from /api/auth/me).
   // Let's assume the user object will be augmented with an `isAdmin` property.

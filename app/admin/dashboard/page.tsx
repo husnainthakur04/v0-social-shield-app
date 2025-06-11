@@ -2,9 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { isAdmin as checkIsAdminClientSide } from '@/lib/authUtils'; // Client-side check based on user object
+import { isAdmin as checkIsAdminClientSide } from '@/lib/authUtils';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/header'; // Using the global header
+import { Header } from '@/components/header';
+import { Badge } from "@/components/ui/badge"; // Import Badge
+import { Button } from "@/components/ui/button"; // Import Button for styling consistency if needed
 
 // Define interfaces for the data to be displayed
 interface FileMetadataAdminView {
@@ -117,7 +119,7 @@ export default function AdminDashboardPage() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8 min-h-[calc(100vh-200px)] text-center">
@@ -148,38 +150,50 @@ export default function AdminDashboardPage() {
               <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                   <tr>
-                    <th scope="col" className="px-4 py-3">File ID</th>
-                    <th scope="col" className="px-4 py-3">Filename</th>
-                    <th scope="col" className="px-4 py-3">Uploaded</th>
-                    <th scope="col" className="px-4 py-3">Size</th>
-                    <th scope="col" className="px-4 py-3">User ID</th>
-                    <th scope="col" className="px-4 py-3">Scan</th>
-                    <th scope="col" className="px-4 py-3">Pwd</th>
-                    <th scope="col" className="px-4 py-3">Expiry</th>
-                    <th scope="col" className="px-4 py-3">DLs</th>
-                    <th scope="col" className="px-4 py-3">Actions</th>
+                    <th scope="col" className="px-6 py-4">File ID</th>
+                    <th scope="col" className="px-6 py-4">Filename</th>
+                    <th scope="col" className="px-6 py-4">Uploaded</th>
+                    <th scope="col" className="px-6 py-4">Size</th>
+                    <th scope="col" className="px-6 py-4">User ID</th>
+                    <th scope="col" className="px-6 py-4">Scan Status</th>
+                    <th scope="col" className="px-6 py-4">Password</th>
+                    <th scope="col" className="px-6 py-4">Expiry</th>
+                    <th scope="col" className="px-6 py-4">Downloads</th>
+                    <th scope="col" className="px-6 py-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {files.map((file) => (
                     <tr key={file.fileId} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                      <td className="px-4 py-2 font-mono text-xs truncate max-w-[100px]" title={file.fileId}>{file.fileId}</td>
-                      <td className="px-4 py-2 truncate max-w-[150px]" title={file.originalFilename}>{file.originalFilename}</td>
-                      <td className="px-4 py-2">{new Date(file.uploadTimestamp).toLocaleDateString()}</td>
-                      <td className="px-4 py-2">{formatBytes(file.fileSize)}</td>
-                      <td className="px-4 py-2 font-mono text-xs truncate max-w-[100px]" title={file.userId}>{file.userId || 'N/A'}</td>
-                      <td className="px-4 py-2">{file.virusScanStatus}</td>
-                      <td className="px-4 py-2">{file.password ? 'Yes' : 'No'}</td>
-                      <td className="px-4 py-2">{file.expiryType !== 'none' ? `${file.expiryValue} ${file.expiryType}` : 'None'}</td>
-                      <td className="px-4 py-2">{file.downloadCount}</td>
-                      <td className="px-4 py-2">
-                        <button className="text-blue-600 dark:text-blue-400 hover:underline text-xs mr-2">Details</button>
-                        <button className="text-red-600 dark:text-red-400 hover:underline text-xs">Delete</button>
+                      <td className="px-6 py-4 font-mono text-xs truncate max-w-[100px]" title={file.fileId}>{file.fileId}</td>
+                      <td className="px-6 py-4 truncate max-w-[150px]" title={file.originalFilename}>{file.originalFilename}</td>
+                      <td className="px-6 py-4">{new Date(file.uploadTimestamp).toLocaleDateString()}</td>
+                      <td className="px-6 py-4">{formatBytes(file.fileSize)}</td>
+                      <td className="px-6 py-4 font-mono text-xs truncate max-w-[100px]" title={file.userId}>{file.userId || 'N/A'}</td>
+                      <td className="px-6 py-4">
+                        <Badge variant={
+                          file.virusScanStatus === 'infected' ? 'destructive' :
+                          file.virusScanStatus === 'clean' ? 'default' : // Using default for 'clean'
+                          'secondary' // For 'pending'
+                        }>
+                          {file.virusScanStatus}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge variant={file.password ? 'outline' : 'secondary'}>
+                          {file.password ? 'Yes' : 'No'}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">{file.expiryType !== 'none' ? `${file.expiryValue} ${file.expiryType}` : 'None'}</td>
+                      <td className="px-6 py-4">{file.downloadCount}</td>
+                      <td className="px-6 py-4 space-x-2">
+                        <Button variant="outline" size="xs" onClick={() => console.log('Details for file:', file.fileId)}>Details</Button>
+                        <Button variant="destructive" size="xs" onClick={() => console.log('Delete file:', file.fileId)}>Delete</Button>
                       </td>
                     </tr>
                   ))}
                   {files.length === 0 && (
-                    <tr><td colSpan={10} className="text-center py-4">No files found.</td></tr>
+                    <tr><td colSpan={10} className="text-center px-6 py-4">No files found.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -193,36 +207,38 @@ export default function AdminDashboardPage() {
               <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                   <tr>
-                    <th scope="col" className="px-4 py-3">Report ID</th>
-                    <th scope="col" className="px-4 py-3">File ID</th>
-                    <th scope="col" className="px-4 py-3">Reason</th>
-                    <th scope="col" className="px-4 py-3">Reporter Email</th>
-                    <th scope="col" className="px-4 py-3">Comments</th>
-                    <th scope="col" className="px-4 py-3">Reported At</th>
-                    <th scope="col" className="px-4 py-3">Actions</th>
+                    <th scope="col" className="px-6 py-4">Report ID</th>
+                    <th scope="col" className="px-6 py-4">File ID</th>
+                    <th scope="col" className="px-6 py-4">Reason</th>
+                    <th scope="col" className="px-6 py-4">Reporter Email</th>
+                    <th scope="col" className="px-6 py-4">Comments</th>
+                    <th scope="col" className="px-6 py-4">Reported At</th>
+                    <th scope="col" className="px-6 py-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {abuseReports.map((report) => (
                     <tr key={report.reportId} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                      <td className="px-4 py-2 font-mono text-xs truncate max-w-[100px]" title={report.reportId}>{report.reportId}</td>
-                      <td className="px-4 py-2 font-mono text-xs truncate max-w-[100px]" title={report.fileId}>
+                      <td className="px-6 py-4 font-mono text-xs truncate max-w-[100px]" title={report.reportId}>{report.reportId}</td>
+                      <td className="px-6 py-4 font-mono text-xs truncate max-w-[100px]" title={report.fileId}>
                         <a href={`/download/${report.fileId}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
                           {report.fileId}
                         </a>
                       </td>
-                      <td className="px-4 py-2">{report.reason}</td>
-                      <td className="px-4 py-2 truncate max-w-[150px]" title={report.reporterEmail}>{report.reporterEmail || 'N/A'}</td>
-                      <td className="px-4 py-2 truncate max-w-[200px]" title={report.comments}>{report.comments}</td>
-                      <td className="px-4 py-2">{new Date(report.timestamp).toLocaleString()}</td>
-                      <td className="px-4 py-2">
-                        <button className="text-blue-600 dark:text-blue-400 hover:underline text-xs mr-2">View File</button>
-                        <button className="text-green-600 dark:text-green-400 hover:underline text-xs">Mark Resolved</button>
+                      <td className="px-6 py-4">
+                        <Badge variant="outline">{report.reason}</Badge>
+                      </td>
+                      <td className="px-6 py-4 truncate max-w-[150px]" title={report.reporterEmail}>{report.reporterEmail || 'N/A'}</td>
+                      <td className="px-6 py-4 truncate max-w-[200px]" title={report.comments}>{report.comments}</td>
+                      <td className="px-6 py-4">{new Date(report.timestamp).toLocaleString()}</td>
+                      <td className="px-6 py-4 space-x-2">
+                        <Button variant="outline" size="xs" onClick={() => router.push(`/download/${report.fileId}`)}>View File</Button>
+                        <Button variant="default" size="xs" className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600" onClick={() => console.log('Mark resolved:', report.reportId)}>Mark Resolved</Button>
                       </td>
                     </tr>
                   ))}
                    {abuseReports.length === 0 && (
-                    <tr><td colSpan={7} className="text-center py-4">No abuse reports found.</td></tr>
+                    <tr><td colSpan={7} className="text-center px-6 py-4">No abuse reports found.</td></tr>
                   )}
                 </tbody>
               </table>

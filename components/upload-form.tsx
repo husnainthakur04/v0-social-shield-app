@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, DragEvent, ChangeEvent } from 'react';
-import { CopyLinkButton } from './copy-link-button'; // Import the new component
+// import { CopyLinkButton } from './copy-link-button'; // Temporarily commented out during debug, will keep basic button for now
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 export function UploadForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -205,25 +207,40 @@ export function UploadForm() {
       </button>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-100 dark:bg-red-700 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 rounded-md">
-          <p>Error: {error}</p>
-        </div>
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Upload Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
       )}
 
       {uploadResponse && uploadResponse.fileId && (
-        <div className="mt-4 p-4 bg-green-100 dark:bg-green-800 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-100 rounded-md">
-          <p className="font-semibold text-lg">Upload Successful!</p>
-          <p className="text-sm mt-2">Your download link is ready:</p>
-          <div className="mt-2 flex items-center space-x-2">
-            <input
-              type="text"
-              readOnly
-              value={uploadResponse.fullUrl || `Loading...`}
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 dark:text-gray-200 text-sm"
-            />
-            {uploadResponse.fullUrl && <CopyLinkButton url={uploadResponse.fullUrl} />}
-          </div>
-        </div>
+        <Alert variant="default" className="mt-4 bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300">
+          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+          <AlertTitle className="text-green-700 dark:text-green-300">Upload Successful!</AlertTitle>
+          <AlertDescription className="text-green-600 dark:text-green-400">
+            <p className="mb-2">Your download link is ready:</p>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                readOnly
+                value={uploadResponse.fullUrl || `Loading...`}
+                className="w-full p-2 border border-green-300 dark:border-green-700 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:ring-green-500 focus:border-green-500"
+              />
+              {/* Using basic copy button as per previous debugging steps */}
+              {uploadResponse.fullUrl && (
+                <button
+                  onClick={() => navigator.clipboard.writeText(uploadResponse.fullUrl!)}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                >
+                  Copy Link
+                </button>
+              )}
+            </div>
+          </AlertDescription>
+        </Alert>
       )}
     </div>
   );

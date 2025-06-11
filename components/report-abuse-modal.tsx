@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, AlertCircle, CheckCircle2 } from '@heroicons/react/24/outline'; // Using Heroicons as they are already imported
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ReportAbuseModalProps {
   fileId: string;
@@ -88,17 +89,25 @@ export function ReportAbuseModal({ fileId, isOpen, onClose, onSubmitSuccess }: R
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Report Abuse for File ID: {fileId}</h2>
 
         {successMessage && (
-          <div className="mb-4 p-3 bg-green-100 dark:bg-green-700 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-200 rounded-md">
-            {successMessage}
-          </div>
+           <Alert variant="default" className="mb-4 bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-700 dark:text-green-300">Report Submitted</AlertTitle>
+            <AlertDescription className="text-green-600 dark:text-green-400">
+              {successMessage}
+            </AlertDescription>
+          </Alert>
         )}
         {error && (
-          <div className="mb-4 p-3 bg-red-100 dark:bg-red-700 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 rounded-md">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Submission Error</AlertTitle>
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
         )}
 
-        {!successMessage && (
+        {!successMessage && ( // Keep the form visible if there's an error, hide if success until modal closes
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="reason" className="block text-sm font-medium text-gray-700 dark:text-gray-200">

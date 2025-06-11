@@ -1,100 +1,31 @@
-// This file now primarily handles server-side logic (generateMetadata)
-// and imports the client component for rendering.
+'use client'; // This is a client component
 
-import type { Metadata, ResolvingMetadata } from 'next';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-import DownloadPageClient from '@/components/download-page-client'; // Import the client component
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import {
+  ArrowDownTrayIcon, EyeIcon, LockClosedIcon, ExclamationTriangleIcon,
+  InformationCircleIcon, ShieldExclamationIcon, AlertCircle, CheckCircle2
+} from '@heroicons/react/24/outline'; // Using Heroicons as they are already imported. Lucide could also be used.
+import { ReportAbuseModal } from '@/components/report-abuse-modal';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Interface for server-side metadata fetching (used by generateMetadata)
-interface ServerFileMetadata {
-  fileId: string;
+// Interface for props passed from the server component (page.tsx) if any,
+// or for the metadata fetched client-side.
+// For now, metadata is fetched client-side in this component.
+interface PublicFileMetadata {
   originalFilename: string;
-  uploadTimestamp: number;
-  password?: string;
+  fileSize: number;
+  fileExtension?: string;
+  isPasswordProtected: boolean;
   expiryType?: 'days' | 'downloads' | 'none';
   expiryValue?: number;
+  uploadTimestamp: number;
   downloadCount: number;
-  fileExtension?: string;
-  fileSize: number;
-  virusScanStatus: 'pending' | 'clean' | 'infected';
-  virusScanDetails?: string;
+  fileId: string;
+  virusScanStatus?: 'pending' | 'clean' | 'infected';
 }
 
-const metadataFilePath = join(process.cwd(), 'uploads', 'metadata.json');
-const defaultOgImageUrl = '/og-default.png'; // Ensure this image exists in public/
-const siteName = 'FileShareX';
-
-async function getFileMetadata(fileId: string): Promise<ServerFileMetadata | null> {
-  try {
-    const data = await readFile(metadataFilePath, 'utf-8');
-    const allMetadata = JSON.parse(data) as ServerFileMetadata[];
-    const metadata = allMetadata.find(m => m.fileId === fileId);
-    return metadata || null;
-  } catch (error) {
-    console.error('Error reading metadata for generateMetadata:', error);
-    return null;
-  }
-}
-
-export async function generateMetadata(
-  { params }: { params: { fileId: string } },
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const fileId = params.fileId;
-  const metadata = await getFileMetadata(fileId);
-  const parentMetadata = await parent; // Access resolved metadata from parent (layout.tsx)
-
-  if (!metadata) {
-    return {
-      title: `File Not Found | ${siteName}`,
-      description: 'The file you are looking for could not be found or is no longer available.',
-      openGraph: {
-        ...parentMetadata.openGraph,
-        title: `File Not Found | ${siteName}`,
-        description: 'The file you are looking for could not be found or is no longer available.',
-        images: [{ url: defaultOgImageUrl, alt: `${siteName} - File Not Found` }],
-      },
-      twitter: {
-        ...parentMetadata.twitter,
-        title: `File Not Found | ${siteName}`,
-        description: 'The file you are looking for could not be found or is no longer available.',
-        images: [defaultOgImageUrl],
-      },
-    };
-  }
-
-  const fileName = metadata.originalFilename;
-  const fileSizeFormatted = formatBytes(metadata.fileSize); // Use existing helper
-  const title = `Download ${fileName}`;
-  const description = `Download ${fileName} (${fileSizeFormatted}). Shared via ${siteName}.`;
-  // Note: Expiry info is hard to get here without more complex date logic, keeping it simple for now.
-
-  return {
-    title: title, // title.template from layout will append "| FileShareX"
-    description: description,
-    openGraph: {
-      ...parentMetadata.openGraph, // Inherit base OG tags
-      title: title, // Override specific OG title
-      description: description,
-      // Using default image; using file as OG image is complex & has security risks
-      images: [{ url: defaultOgImageUrl, alt: `Download ${fileName} on ${siteName}` }],
-      // Could add specific OG type if relevant, e.g., 'article' if it's a document
-      // type: 'article',
-      // publishedTime: new Date(metadata.uploadTimestamp).toISOString(), // Example
-    },
-    twitter: {
-      ...parentMetadata.twitter, // Inherit base Twitter tags
-      title: title,
-      description: description,
-      images: [defaultOgImageUrl],
-    },
-  };
-}
-
-
-// Helper function to format bytes (already in the file, ensure it's accessible or duplicate if needed for server context)
-// Helper function to format bytes (used by generateMetadata, so keep it server-side)
+// Helper function to format bytes
 function formatBytes(bytes: number, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
@@ -126,8 +57,7 @@ function getExpiryInfo(metadata: PublicFileMetadata): { text: string; expired: b
   return { text: 'No specific expiry set.', expired: false, colorClass: 'text-gray-500 dark:text-gray-400' };
 }
 
-
-export default function DownloadPage() {
+export default function DownloadPageClient() {
   const params = useParams();
   const fileId = params?.fileId as string | undefined;
   const router = useRouter();
@@ -141,7 +71,6 @@ export default function DownloadPage() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportSuccessMessage, setReportSuccessMessage] = useState<string | null>(null);
-
 
   const isImage = metadata?.fileExtension && ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(metadata.fileExtension.toLowerCase());
 
@@ -157,13 +86,15 @@ export default function DownloadPage() {
         })
         .then((data: PublicFileMetadata) => {
           setMetadata(data);
-          if (!data.isPasswordProtected) {
+          if (!data.isPasswordProtected && data.virusScanStatus !== 'infected') {
             setDownloadUrl(`/api/download/${data.fileId}`);
           }
-          // Check for immediate expiry from metadata (e.g. if API already determined it)
           const expiryInfo = getExpiryInfo(data);
           if (expiryInfo.expired) {
             setError(expiryInfo.text);
+          }
+          if (data.virusScanStatus === 'infected') {
+            setError('This file has been flagged as potentially harmful and cannot be downloaded.');
           }
         })
         .catch(err => {
@@ -185,25 +116,26 @@ export default function DownloadPage() {
     }
     setPasswordError(null);
 
-    // Attempt to fetch the file with the password to verify.
-    // This also serves as a check if the download link is valid with this password.
     const testDownloadUrl = `/api/download/${metadata.fileId}?password=${encodeURIComponent(password)}`;
     try {
-        const res = await fetch(testDownloadUrl, { method: 'HEAD' }); // Use HEAD to check headers, not download
+        const res = await fetch(testDownloadUrl, { method: 'HEAD' });
         if (res.ok) {
-            setDownloadUrl(testDownloadUrl); // Password is correct, allow download and preview
-            // The actual download will happen when the user clicks the download button or views preview
+            setDownloadUrl(testDownloadUrl);
         } else if (res.status === 401 || res.status === 403) {
             const errorData = await res.json();
             if (errorData.code === 'PASSWORD_REQUIRED' && !password) {
                  setPasswordError('Password is required to download this file.');
             } else if (errorData.code === 'INCORRECT_PASSWORD') {
                  setPasswordError('Incorrect password. Please try again.');
-            } else {
+            } else if (errorData.code === 'FILE_INFECTED') {
+                 setError(errorData.error || 'This file is infected and cannot be downloaded.');
+                 setDownloadUrl(null);
+            }
+            else {
                  setPasswordError(errorData.error || 'Failed to unlock with password.');
             }
-            setDownloadUrl(null);
-        } else if (res.status === 410) { // Link expired (date or downloads)
+            if(errorData.code !== 'FILE_INFECTED') setDownloadUrl(null);
+        } else if (res.status === 410) {
             const errorData = await res.json();
             setError(errorData.error || 'This link has expired.');
             setDownloadUrl(null);
@@ -230,7 +162,7 @@ export default function DownloadPage() {
     );
   }
 
-  if (error || (expiryDetails && expiryDetails.expired && !metadata?.isPasswordProtected)) { // If already expired and no password needed to check again
+  if (error || (expiryDetails && expiryDetails.expired && (!metadata?.isPasswordProtected || downloadUrl))) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4 text-center">
         <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mb-4" />
@@ -247,7 +179,6 @@ export default function DownloadPage() {
   }
 
   if (!metadata) {
-    // This case should ideally be covered by the error state from fetch, but as a fallback:
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
         <ExclamationTriangleIcon className="h-16 w-16 text-red-500 mb-4" />
@@ -261,7 +192,6 @@ export default function DownloadPage() {
       </div>
     );
   }
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
@@ -283,7 +213,6 @@ export default function DownloadPage() {
             </div>
         )}
 
-        {/* Virus Scan Status */}
         {metadata.virusScanStatus && (
           <div className={`text-sm mb-1 ${metadata.virusScanStatus === 'infected' ? 'text-red-500 dark:text-red-400 font-semibold' : metadata.virusScanStatus === 'pending' ? 'text-yellow-500 dark:text-yellow-400' : 'text-green-500 dark:text-green-400'}`}>
             Virus Scan: {metadata.virusScanStatus.charAt(0).toUpperCase() + metadata.virusScanStatus.slice(1)}
@@ -295,8 +224,6 @@ export default function DownloadPage() {
             </p>
         )}
 
-
-        {/* Password Form */}
         {metadata.isPasswordProtected && !downloadUrl && !expiryDetails?.expired && metadata.virusScanStatus !== 'infected' && (
           <form onSubmit={handlePasswordSubmit} className="mb-6 space-y-4">
             <p className="text-sm text-yellow-600 dark:text-yellow-400 flex items-center">
@@ -315,7 +242,15 @@ export default function DownloadPage() {
                 required
               />
             </div>
-            {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
+            {passwordError && (
+              <Alert variant="destructive" className="mt-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Authentication Error</AlertTitle>
+                <AlertDescription>
+                  {passwordError}
+                </AlertDescription>
+              </Alert>
+            )}
             <button
               type="submit"
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
@@ -325,7 +260,6 @@ export default function DownloadPage() {
           </form>
         )}
 
-        {/* Download Button and Preview */}
         {downloadUrl && !expiryDetails?.expired && metadata.virusScanStatus !== 'infected' && (
           <div className="space-y-6">
             {isImage && (
@@ -339,7 +273,7 @@ export default function DownloadPage() {
                 {showPreview && (
                   <div className="mt-2 border dark:border-gray-600 rounded-md overflow-hidden max-h-96 flex justify-center items-center bg-gray-100 dark:bg-gray-700">
                     <img
-                      src={downloadUrl} // Use the (potentially passworded) download URL for preview
+                      src={downloadUrl}
                       alt={`Preview of ${metadata.originalFilename}`}
                       className="max-w-full max-h-96 object-contain"
                       onError={() => {
@@ -354,7 +288,7 @@ export default function DownloadPage() {
 
             <a
               href={downloadUrl}
-              download={metadata.originalFilename} // Suggests original filename to browser
+              download={metadata.originalFilename}
               className="w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-lg text-lg font-semibold text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 transition-transform transform hover:scale-105"
             >
               <ArrowDownTrayIcon className="h-6 w-6 mr-3" />
@@ -362,31 +296,31 @@ export default function DownloadPage() {
             </a>
           </div>
         )}
-         {/* Message if link is valid but password not yet entered or downloadUrl not set and not expired */}
-        {!downloadUrl && !metadata.isPasswordProtected && !expiryDetails?.expired && (
+        {!downloadUrl && !metadata.isPasswordProtected && !expiryDetails?.expired && metadata.virusScanStatus !== 'infected' && (
              <div className="mt-6 text-center">
                 <p className="text-gray-600 dark:text-gray-300">Your download should be ready.</p>
-                 {/* This case might indicate an issue if downloadUrl isn't set for a non-password protected file */}
             </div>
         )}
 
-        {/* Report Abuse Button */}
         {!expiryDetails?.expired && metadata.virusScanStatus !== 'infected' && (
           <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 text-center">
             <button
               onClick={() => setIsReportModalOpen(true)}
-              className="text-xs text-red-500 dark:text-red-400 hover:underline flex items-center justify-center mx-auto"
+              className="text-sm px-3 py-1.5 text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-md transition-colors flex items-center justify-center mx-auto"
             >
               <ShieldExclamationIcon className="h-4 w-4 mr-1" /> Report Abuse
             </button>
           </div>
         )}
         {reportSuccessMessage && (
-            <div className="mt-4 p-2 text-sm bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-200 rounded-md">
-                {reportSuccessMessage}
-            </div>
+          <Alert variant="default" className="mt-4 bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-700 dark:text-green-300">Success</AlertTitle>
+            <AlertDescription className="text-green-600 dark:text-green-400">
+              {reportSuccessMessage}
+            </AlertDescription>
+          </Alert>
         )}
-
 
         <div className="mt-8 text-center">
           <button
@@ -405,8 +339,8 @@ export default function DownloadPage() {
           onClose={() => setIsReportModalOpen(false)}
           onSubmitSuccess={(message) => {
             setReportSuccessMessage(message);
-            setIsReportModalOpen(false); // Close modal on success
-            setTimeout(() => setReportSuccessMessage(null), 5000); // Clear message after 5s
+            setIsReportModalOpen(false);
+            setTimeout(() => setReportSuccessMessage(null), 5000);
           }}
         />
       )}

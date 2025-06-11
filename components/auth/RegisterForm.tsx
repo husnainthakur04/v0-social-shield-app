@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useAuth } from '@/contexts/AuthContext'; // Assuming path is correct
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle2 } from "lucide-react"; // Or use Heroicons if preferred
 
 export function RegisterForm() {
   const [email, setEmail] = useState('');
@@ -50,9 +52,25 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md p-8 bg-white dark:bg-gray-800 shadow-xl rounded-lg">
       <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">Create Account</h2>
-      
-      {error && <p className="text-sm text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900 p-3 rounded-md">{error}</p>}
-      {successMessage && <p className="text-sm text-green-500 dark:text-green-400 bg-green-100 dark:bg-green-900 p-3 rounded-md">{successMessage}</p>}
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Registration Failed</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
+      {successMessage && (
+        <Alert variant="default" className="bg-green-50 dark:bg-green-900/30 border-green-500 dark:border-green-600 text-green-700 dark:text-green-300">
+          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+          <AlertTitle className="text-green-700 dark:text-green-300">Registration Successful</AlertTitle>
+          <AlertDescription className="text-green-600 dark:text-green-400">
+            {successMessage}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div>
         <label htmlFor="email-register" className="block text-sm font-medium text-gray-700 dark:text-gray-200">

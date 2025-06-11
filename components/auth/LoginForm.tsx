@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useAuth } from '@/contexts/AuthContext'; // Assuming path is correct
+import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react"; // Or use Heroicons if preferred
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
@@ -21,7 +23,7 @@ export function LoginForm() {
     try {
       await login(email, password);
       // Redirect to dashboard or homepage after successful login
-      router.push('/dashboard'); 
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to log in. Please check your credentials.');
     } finally {
@@ -32,8 +34,16 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md p-8 bg-white dark:bg-gray-800 shadow-xl rounded-lg">
       <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white">Log In</h2>
-      
-      {error && <p className="text-sm text-red-500 dark:text-red-400 bg-red-100 dark:bg-red-900 p-3 rounded-md">{error}</p>}
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Login Failed</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div>
         <label htmlFor="email-login" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
@@ -68,7 +78,7 @@ export function LoginForm() {
           placeholder="••••••••"
         />
       </div>
-      
+
       {/* Optional: Add "Forgot password?" link here */}
       {/* <div className="text-sm text-right">
         <a href="#" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">

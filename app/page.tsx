@@ -1,7 +1,7 @@
-export default function Home() {
-  return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-gray-50 dark:bg-gray-900 text-center">
-import { UploadForm } from '@/components/upload-form'; // Import the new component
+import { UploadForm } from '@/components/upload-form'; // Restore UploadForm
+
+import { UploadForm } from '@/components/upload-form';
+import { DownloadCloud, UserX, ShieldCheck, Zap } from 'lucide-react'; // Import selected icons
 
 export default function Home() {
   return (
@@ -14,9 +14,6 @@ export default function Home() {
         <p className="text-md sm:text-lg text-gray-600 dark:text-gray-300 mb-8">
           Easily upload files and get a shareable download link—no sign-up needed.
         </p>
-        {/* The "Upload File" button from the hero section is effectively replaced by the UploadForm.
-            If a separate Hero CTA button is desired that *scrolls* to the UploadForm or opens it in a modal,
-            that can be added. For now, the form itself will be directly visible. */}
       </section>
 
       {/* Upload Area */}
@@ -25,24 +22,36 @@ export default function Home() {
       </section>
 
       {/* Key Features Section */}
-      <section className="key-features-section w-full max-w-4xl">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-10">Why Choose Our Service?</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="feature-item p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+      <section className="key-features-section w-full max-w-5xl"> {/* Increased max-w for better spacing with icons potentially */}
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-12">Why Choose Our Service?</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+          {/* Feature 1 */}
+          <div className="feature-item flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <DownloadCloud className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">Unlimited Free Downloads</h3>
-            <p className="text-gray-600 dark:text-gray-400">No limits on how many times your files are downloaded.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">No limits on how many times your files are downloaded.</p>
           </div>
-          <div className="feature-item p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+
+          {/* Feature 2 */}
+          <div className="feature-item flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <UserX className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">No Sign-Up Required</h3>
-            <p className="text-gray-600 dark:text-gray-400">Quickly upload and share without creating an account.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Quickly upload and share without creating an account.</p>
           </div>
-          <div className="feature-item p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+
+          {/* Feature 3 */}
+          <div className="feature-item flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <ShieldCheck className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">Secure File Storage</h3>
-            <p className="text-gray-600 dark:text-gray-400">Your files are stored securely (details coming soon!).</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Your files are stored securely (details coming soon!).</p>
           </div>
-          <div className="feature-item p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+
+          {/* Feature 4 */}
+          <div className="feature-item flex flex-col items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <Zap className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 dark:text-white mb-2">Fast Upload/Download</h3>
-            <p className="text-gray-600 dark:text-gray-400">Optimized for speed and efficiency.</p>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">Optimized for speed and efficiency.</p>
           </div>
         </div>
       </section>

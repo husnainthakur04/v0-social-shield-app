@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Privacy Policy</h1>
         <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
           <p>This Privacy Policy describes how FileShareX ("we", "us", or "our") collects, uses, and shares information when you use our file sharing service (the "Service").</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">Information We Collect</h2>
           <p><strong>Files You Upload:</strong> We temporarily store files you upload to provide the sharing service. Metadata associated with these files (like filename, size, upload date, password if set, and expiry options) is also stored.</p>
           <p><strong>Usage Information:</strong> We may collect information about how you interact with the Service, such as IP addresses, browser type, access times, and referring URLs. This is for analytical purposes and to improve our service.</p>
@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-xl font-semibold mt-6 mb-3">Data Retention</h2>
           <p>Files are retained according to their expiry settings. Once expired or if the system cleans up old files, they are deleted from our servers.</p>
           <p>Metadata may be retained for longer periods for analytical and operational purposes.</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">Security</h2>
           <p>We take reasonable measures to protect the information provided via the Service, but no method of transmission over the Internet or electronic storage is 100% secure.</p>
 

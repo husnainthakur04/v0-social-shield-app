@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     // Return user info (excluding password hash) and add isAdmin flag
     const { passwordHash, ...userWithoutPassword } = user;
     const isAdmin = !!process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL;
-    
+
     return NextResponse.json({ success: true, user: { ...userWithoutPassword, isAdmin } });
 
   } catch (error: any) {

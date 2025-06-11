@@ -22,11 +22,11 @@ export default function ReportAbuseInfoPage() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Reporting Abuse</h1>
         <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
           <p>FileShareX is committed to maintaining a safe and respectful environment for all users. We take violations of our Terms of Service and illegal activities very seriously.</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">How to Report Abuse</h2>
           <p>If you encounter a file on our platform that you believe violates our policies or is illegal, please report it to us immediately.</p>
           <p>The primary way to report a specific file is by using the <strong>"Report Abuse"</strong> button located on the download page for that file. This button will open a form where you can specify the reason for your report and provide additional comments.</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">What to Report</h2>
           <p>You should report content that includes, but is not limited to:</p>
           <ul>
@@ -49,7 +49,7 @@ export default function ReportAbuseInfoPage() {
 
           <h2 className="text-xl font-semibold mt-6 mb-3">Contact for Urgent Matters</h2>
           <p>If you believe there is an urgent matter that requires immediate attention outside of the standard reporting process for a specific file, please contact us via the details on our <Link href="/contact" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">Contact Us page</Link>, clearly indicating the urgency.</p>
-          
+
           <p className="mt-8 text-sm">
             <em>Thank you for helping us keep FileShareX a safe platform. This page provides general information; specific reporting should be done via the download page of the file in question.</em>
           </p>

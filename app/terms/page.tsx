@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">Terms of Service</h1>
         <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
           <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the FileShareX website (the "Service") operated by us.</p>
-          
+
           <h2 className="text-xl font-semibold mt-6 mb-3">Acceptance of Terms</h2>
           <p>By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
 
